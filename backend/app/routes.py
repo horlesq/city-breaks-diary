@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
-from models import Trip, TripResponse, UserLogin, Location
-from database import trip_collection
+from .models import Trip, TripResponse, UserLogin, Location
+from .database import trip_collection
 from bson import ObjectId
 from typing import List
 
@@ -27,3 +27,7 @@ async def login(user: UserLogin):
     # You can replace this with actual authentication (e.g., checking a database)
     if user.username == "test" and user.password == "test":  # Example condition
         return {"message": "Login successful"}
+
+@router.get("/")
+async def root():
+    return {"message": "Welcome to Map-My-Trip API"}
