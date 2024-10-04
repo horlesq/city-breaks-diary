@@ -10,13 +10,12 @@ export function Homepage() {
                 <h1>
                     Discover the world.
                     <br />
-                    Map My Trip marks your adventures.
+                    City Breaks Diary marks your adventures.
                 </h1>
                 <h2>
-                    Pin every city or destination you&apos;ve explored on a
-                    personalized map. Keep track of your travels and revisit
-                    your memorable adventures as you chart your journey across
-                    the globe.
+                    Pin every city you&apos;ve explored on a personalized map.
+                    Keep track of your travels and revisit your memorable
+                    adventures as you chart your journey across the globe.
                 </h2>
                 <Link to="/app" className="cta">
                     Start tracking now
