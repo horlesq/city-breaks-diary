@@ -1,20 +1,20 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Dict, Optional
 
 # Model for the location data
-class Location(BaseModel):
-    name: str  # Name of the location
-    country: str  # Country where the location is
-    emoji: str  # Emoji representing the country
-    date: str  # Date of the visit
-    notes: Optional[str] = None  # Notes about the trip
-    position: dict  # Position containing latitude and longitude
+class City(BaseModel):
+    cityName: str
+    country: str
+    emoji: str
+    date: str
+    notes: Optional[str] = None
+    position: Dict[str, float] 
     id: int  # Unique identifier for the location
 
 # Model for a trip associated with a user
 class Trip(BaseModel):
-    user_id: str  # Identifier for the user
-    locations: List[Location]  # List of locations visited in the trip
+    user_id: str
+    cities: List[City]
 
 # Model for responses from the trips collection
 class TripResponse(Trip):

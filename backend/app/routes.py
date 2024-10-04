@@ -1,7 +1,6 @@
 from fastapi import APIRouter, HTTPException
-from .models import Trip, TripResponse, UserLogin, Location
+from .models import Trip, TripResponse, UserLogin
 from .database import trip_collection
-from bson import ObjectId
 from typing import List
 
 router = APIRouter()
@@ -11,7 +10,13 @@ router = APIRouter()
 async def create_trip(trip: Trip):
     trip_data = trip.dict()
     new_trip = await trip_collection.insert_one(trip_data)
+    
+    # Fetch the created trip from the database
     created_trip = await trip_collection.find_one({"_id": new_trip.inserted_id})
+    
+    if created_trip is None:
+        raise HTTPException(status_code=400, detail="Trip could not be created.")
+    
     return TripResponse(**created_trip, id=str(created_trip["_id"]))
 
 # Get all trips for a specific user
@@ -24,7 +29,6 @@ async def get_trips(user_id: str):
 @router.post("/login/")
 async def login(user: UserLogin):
     # Placeholder for user authentication logic
-    # You can replace this with actual authentication (e.g., checking a database)
     if user.username == "test" and user.password == "test":  # Example condition
         return {"message": "Login successful"}
 
