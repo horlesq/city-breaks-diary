@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from .models import Trip, TripResponse, UserLogin
+from .models import Trip, TripResponse, UserLogin, City
 from .database import trip_collection
 from typing import List
 
@@ -24,6 +24,15 @@ async def create_trip(trip: Trip):
 async def get_trips(user_id: str):
     trips = await trip_collection.find({"user_id": user_id}).to_list(1000)
     return [TripResponse(**trip, id=str(trip["_id"])) for trip in trips]
+
+# Get all cities for a specific user
+@router.get("/trips/{user_id}/cities", response_model=List[City])
+async def get_cities(user_id: str):
+    trips = await trip_collection.find({"user_id": user_id}).to_list(1000)
+    cities = []
+    for trip in trips:
+        cities.extend(trip.get("cities", []))  # Extract cities from each trip
+    return cities
 
 # Login functionality
 @router.post("/login/")
