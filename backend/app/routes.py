@@ -5,19 +5,30 @@ from typing import List
 
 router = APIRouter()
 
-# Create a new trip
-@router.post("/trips/", response_model=TripResponse)
-async def create_trip(trip: Trip):
-    trip_data = trip.dict()
-    new_trip = await trip_collection.insert_one(trip_data)
+# Update the trip by adding cities to an existing user's trip
+# Create a new trip if it doesn't exist
+@router.post("/trips/")
+async def add_or_create_trip(trip: Trip):
+    # Convert the cities list into dictionaries
+    trip_dict = trip.dict()
     
-    # Fetch the created trip from the database
-    created_trip = await trip_collection.find_one({"_id": new_trip.inserted_id})
-    
-    if created_trip is None:
-        raise HTTPException(status_code=400, detail="Trip could not be created.")
-    
-    return TripResponse(**created_trip, id=str(created_trip["_id"]))
+    # Try to find the user's trip document
+    existing_trip = await trip_collection.find_one({"user_id": trip.user_id})
+
+    if existing_trip:
+        # If the trip exists, append the new cities to the existing cities array
+        await trip_collection.update_one(
+            {"user_id": trip.user_id},
+            {"$push": {"cities": {"$each": trip_dict['cities']}}}  # Adds multiple cities
+        )
+        updated_trip = await trip_collection.find_one({"user_id": trip.user_id})
+        return TripResponse(**updated_trip, id=str(updated_trip["_id"]))
+    else:
+        # If the trip does not exist, create a new trip
+        trip_data = trip_dict  # Already converted to dict
+        new_trip = await trip_collection.insert_one(trip_data)
+        created_trip = await trip_collection.find_one({"_id": new_trip.inserted_id})
+        return TripResponse(**created_trip, id=str(created_trip["_id"]))
 
 # Get all trips for a specific user
 @router.get("/trips/{user_id}", response_model=List[TripResponse])
