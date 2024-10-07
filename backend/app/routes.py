@@ -45,6 +45,16 @@ async def get_cities(user_id: str):
         cities.extend(trip.get("cities", []))  # Extract cities from each trip
     return cities
 
+# Get a specific city by its ID for a specific user
+@router.get("/trips/{user_id}/cities/{city_id}", response_model=City)
+async def get_city(user_id: str, city_id: int):
+    trips = await trip_collection.find({"user_id": user_id}).to_list(1000)
+    for trip in trips:
+        for city in trip.get("cities", []):
+            if city["id"] == city_id:
+                return city
+    raise HTTPException(status_code=404, detail="City not found")
+
 # Login functionality
 @router.post("/login/")
 async def login(user: UserLogin):
