@@ -1,24 +1,74 @@
-import styles from "./Map.module.css";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import {
+    MapContainer,
+    TileLayer,
+    Marker,
+    Popup,
+    useMap,
+    useMapEvents,
+} from "react-leaflet";
+import { useEffect, useState } from "react";
+import { useCities } from "../contexts/CitiesContext";
+import { flagemojiToPNG } from "./Sidebar";
+import styles from "./Map.module.css";
 
 export function Map() {
-    const navigate = useNavigate();
+    const { cities } = useCities();
+    const [mapPosition, setMapPosition] = useState([40, 0]);
 
     const [searchParams, setSearchParams] = useSearchParams();
-    const lat = searchParams.get("lat");
-    const lng = searchParams.get("lng");
+    const mapLat = searchParams.get("lat");
+    const mapLng = searchParams.get("lng");
+
+    useEffect(
+        function () {
+            if (mapLat && mapLng)
+                setMapPosition([parseFloat(mapLat), parseFloat(mapLng)]);
+        },
+        [mapLat, mapLng]
+    );
 
     return (
-        <div
-            className={styles.mapContainer}
-            onClick={() => {
-                navigate("form");
-            }}
-        >
-            <h1>
-                {lat}
-                {lng}
-            </h1>
+        <div className={styles.mapContainer}>
+            <MapContainer
+                center={mapPosition}
+                zoom={7}
+                scrollWheelZoom={true}
+                className={styles.map}
+            >
+                <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}{r}.png"
+                />
+                {cities.map((city) => (
+                    <Marker
+                        position={[city.position.lat, city.position.lng]}
+                        key={city.id}
+                    >
+                        <Popup>
+                            <span>{flagemojiToPNG(city.emoji)}</span>
+                            <span>{city.cityName}</span>
+                        </Popup>
+                    </Marker>
+                ))}
+                <ChangeCenter position={mapPosition} />
+                <DetectClick />
+            </MapContainer>
         </div>
     );
+}
+
+function ChangeCenter({ position }) {
+    const map = useMap();
+    map.setView(position);
+    return null;
+}
+
+function DetectClick() {
+    const navigate = useNavigate();
+
+    useMapEvents({
+        click: (event) =>
+            navigate(`form?lat=${event.latlng.lat}&lng=${event.latlng.lng}`),
+    });
 }
