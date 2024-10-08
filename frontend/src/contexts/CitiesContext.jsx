@@ -39,9 +39,35 @@ function CitiesProvider({ children }) {
         }
     }
 
+    async function postCity(newCity) {
+        try {
+            setIsLoading(true);
+
+            const res = await fetch(`${BASE_URL}/${user}/cities`, {
+                method: "POST",
+                body: JSON.stringify(newCity),
+                headers: { "Content-Type": "application/json" },
+            });
+
+            if (!res.ok) {
+                const errMessage = await res.json();
+                throw new Error(errMessage.detail || "Failed to add city");
+            }
+
+            setCities((cities) => [...cities, newCity]);
+        } catch (error) {
+            console.error(error.message);
+            throw new Error(
+                "City break for this date has already been added. Please select a different date or update the existing entry."
+            );
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
     return (
         <CitiesContext.Provider
-            value={{ cities, currentCity, getCity, isLoading }}
+            value={{ cities, currentCity, getCity, postCity, isLoading }}
         >
             {children}
         </CitiesContext.Provider>

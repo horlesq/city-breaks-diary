@@ -1,4 +1,4 @@
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useCities } from "../contexts/CitiesContext";
 import { useGeolocation } from "../hooks/useGeolocation";
@@ -13,19 +13,17 @@ import {
 import { flagemojiToPNG } from "./Sidebar";
 import styles from "./Map.module.css";
 import { Button } from "./Button";
+import { useUrlPosition } from "../hooks/useUrlPosition";
 
 export function Map() {
     const { cities } = useCities();
     const [mapPosition, setMapPosition] = useState([40, 0]);
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [mapLat, mapLng] = useUrlPosition();
     const {
         isLoading: IsLoadingPosition,
         position: geolocationPosition,
         getPosition,
     } = useGeolocation();
-
-    const mapLat = searchParams.get("lat");
-    const mapLng = searchParams.get("lng");
 
     useEffect(
         function () {
