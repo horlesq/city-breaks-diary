@@ -31,11 +31,13 @@ async def add_or_create_trip(trip: Trip):
         created_trip = await trip_collection.find_one({"_id": new_trip.inserted_id})
         return TripResponse(**created_trip, id=str(created_trip["_id"]))
 
+
 # Get all trips for a specific user
 @router.get("/trips/{user_id}", response_model=List[TripResponse])
 async def get_trips(user_id: str):
     trips = await trip_collection.find({"user_id": user_id}).to_list(1000)
     return [TripResponse(**trip, id=str(trip["_id"])) for trip in trips]
+
 
 # Get all cities for a specific user
 @router.get("/trips/{user_id}/cities", response_model=List[City])
@@ -46,6 +48,7 @@ async def get_cities(user_id: str):
         cities.extend(trip.get("cities", []))  # Extract cities from each trip
     return cities
 
+
 # Get a specific city by its ID for a specific user
 @router.get("/trips/{user_id}/cities/{city_id}", response_model=City)
 async def get_city(user_id: str, city_id: int):
@@ -55,6 +58,7 @@ async def get_city(user_id: str, city_id: int):
             if city["id"] == city_id:
                 return city
     raise HTTPException(status_code=404, detail="City not found")
+
 
 # Route to add a new city
 @router.post("/trips/{user_id}/cities")
@@ -83,12 +87,40 @@ async def post_city(user_id: str, city: City):
 
     return {"message": "City added successfully"}
 
+
+@router.delete("/trips/{user_id}/cities/{city_id}")
+async def delete_city(user_id: str, city_id: int):
+    # Find the user document
+    user_document = await trip_collection.find_one({"user_id": user_id})
+
+    if not user_document:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Check if the city exists in the user's cities
+    existing_city = next((city for city in user_document.get("cities", []) if city["id"] == city_id), None)
+
+    if not existing_city:
+        raise HTTPException(status_code=404, detail="City not found")
+
+    # Remove the city from the user's cities
+    update_result = await trip_collection.update_one(
+        {"user_id": user_id},
+        {"$pull": {"cities": {"id": city_id}}}
+    )
+
+    if update_result.modified_count == 0:
+        raise HTTPException(status_code=400, detail="Failed to delete city")
+
+    return {"message": "City deleted successfully"}
+
+
 # Login functionality
 @router.post("/login/")
 async def login(user: UserLogin):
     # Placeholder for user authentication logic
     if user.username == "test" and user.password == "test":  # Example condition
         return {"message": "Login successful"}
+
 
 @router.get("/")
 async def root():
