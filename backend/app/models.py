@@ -1,6 +1,11 @@
 from pydantic import BaseModel
 from typing import List, Dict, Optional
 
+# Define the Position model
+class Position(BaseModel):
+    lat: float
+    lng: float
+    
 # Model for the location data
 class City(BaseModel):
     cityName: str
@@ -8,7 +13,7 @@ class City(BaseModel):
     emoji: str
     date: str
     notes: Optional[str] = None
-    position: Dict[str, float] 
+    position: Position 
     id: int  # Unique identifier for the location
 
 # Model for a trip associated with a user

@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 from .models import Trip, TripResponse, UserLogin, City
 from .database import trip_collection
 from typing import List
+from uuid import uuid4
 
 router = APIRouter()
 
@@ -54,6 +55,33 @@ async def get_city(user_id: str, city_id: int):
             if city["id"] == city_id:
                 return city
     raise HTTPException(status_code=404, detail="City not found")
+
+# Route to add a new city
+@router.post("/trips/{user_id}/cities")
+async def post_city(user_id: str, city: City):
+    # Prepare the city data for insertion into MongoDB
+    city_data = city.dict()
+    
+    # Check if the city with the same id already exists for the user
+    existing_city = await trip_collection.find_one(
+        {"user_id": user_id, "cities.id": city.id}
+    )
+
+    if existing_city:
+        raise HTTPException(
+            status_code=403, detail=f"City with id {city.id} already exists for this user."
+        )
+    
+    # Do not set the _id field here; MongoDB will handle it automatically
+    update_result = await trip_collection.update_one(
+        {"user_id": user_id},
+        {"$push": {"cities": city_data}}
+    )
+
+    if update_result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="User not found or no cities added")
+
+    return {"message": "City added successfully"}
 
 # Login functionality
 @router.post("/login/")
