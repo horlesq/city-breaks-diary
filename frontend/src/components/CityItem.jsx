@@ -4,8 +4,13 @@ import { flagemojiToPNG, formatDate } from "./Sidebar";
 import { useCities } from "../contexts/CitiesContext";
 
 export function CityItem({ city }) {
-    const { currentCity } = useCities();
+    const { currentCity, deleteCity } = useCities();
     const { cityName, emoji, date, id, position } = city;
+
+    function handleDelete(event) {
+        event.preventDefault();
+        deleteCity(id);
+    }
 
     return (
         <li>
@@ -18,7 +23,9 @@ export function CityItem({ city }) {
                 <span className={styles.emoji}>{flagemojiToPNG(emoji)}</span>
                 <h3 className={styles.name}>{cityName}</h3>
                 <time className={styles.date}>{formatDate(date)}</time>
-                <button className={styles.deleteBtn}>&times;</button>
+                <button className={styles.deleteBtn} onClick={handleDelete}>
+                    &times;
+                </button>
             </Link>
         </li>
     );
