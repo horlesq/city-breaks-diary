@@ -28,7 +28,7 @@ async def register_user(user: User):
     user_data = {"email": user.email, "password": hashed_password}
     await user_collection.insert_one(user_data)
 
-    return {"message": "User registered successfully"}
+    return user
 
 #
 @router.post("/user/login")
@@ -44,7 +44,7 @@ async def login_user(user: User):
 
     # Optionally, create a token (JWT) and return it
     # For simplicity, return a success message for now
-    return {"message": "Login successful"}
+    return user
 
 
 # Update the trip by adding cities to an existing user's trip
