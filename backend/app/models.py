@@ -1,5 +1,10 @@
-from pydantic import BaseModel
-from typing import List, Dict, Optional
+from pydantic import BaseModel,  EmailStr
+from typing import List, Optional
+
+# Model for User input validation
+class User(BaseModel):
+    email: EmailStr
+    password: str
 
 # Define the Position model
 class Position(BaseModel):
@@ -24,8 +29,3 @@ class Trip(BaseModel):
 # Model for responses from the trips collection
 class TripResponse(Trip):
     id: str  # Unique identifier for the trip document in the database
-
-# Model for user login
-class UserLogin(BaseModel):
-    username: str  # Username of the user
-    password: str  # Password of the user

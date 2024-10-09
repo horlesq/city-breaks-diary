@@ -1,10 +1,51 @@
 from fastapi import APIRouter, HTTPException
-from .models import Trip, TripResponse, UserLogin, City
-from .database import trip_collection
+from .models import Trip, TripResponse, City, User
+from .database import trip_collection, user_collection
 from typing import List
 from uuid import uuid4
+from passlib.context import CryptContext
 
 router = APIRouter()
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# Helper function to verify passwords
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return pwd_context.verify(plain_password, hashed_password)
+
+# Create a new user if it doesn't exist
+@router.post("/user/register")
+async def register_user(user: User):
+    # Check if user already exists
+    existing_user = await user_collection.find_one({"email": user.email})
+    if existing_user:
+        raise HTTPException(status_code=400, detail="User with this email already exists.")
+    
+    # Hash the password
+    hashed_password = pwd_context.hash(user.password)
+    
+    # Store the user in the database
+    user_data = {"email": user.email, "password": hashed_password}
+    await user_collection.insert_one(user_data)
+
+    return {"message": "User registered successfully"}
+
+#
+@router.post("/user/login")
+async def login_user(user: User):
+    # Check if the user exists in the database
+    existing_user = await user_collection.find_one({"email": user.email})
+    if not existing_user:
+        raise HTTPException(status_code=400, detail="No account for this email.")
+
+    # Verify the provided password against the hashed password
+    if not verify_password(user.password, existing_user["password"]):
+        raise HTTPException(status_code=400, detail="Invalid password.")
+
+    # Optionally, create a token (JWT) and return it
+    # For simplicity, return a success message for now
+    return {"message": "Login successful"}
+
 
 # Update the trip by adding cities to an existing user's trip
 # Create a new trip if it doesn't exist
@@ -60,7 +101,7 @@ async def get_city(user_id: str, city_id: int):
     raise HTTPException(status_code=404, detail="City not found")
 
 
-# Route to add a new city
+# Route to add a new city for user
 @router.post("/trips/{user_id}/cities")
 async def post_city(user_id: str, city: City):
     # Prepare the city data for insertion into MongoDB
@@ -88,6 +129,7 @@ async def post_city(user_id: str, city: City):
     return {"message": "City added successfully"}
 
 
+# Route to delete a city for user
 @router.delete("/trips/{user_id}/cities/{city_id}")
 async def delete_city(user_id: str, city_id: int):
     # Find the user document
@@ -112,14 +154,6 @@ async def delete_city(user_id: str, city_id: int):
         raise HTTPException(status_code=400, detail="Failed to delete city")
 
     return {"message": "City deleted successfully"}
-
-
-# Login functionality
-@router.post("/login/")
-async def login(user: UserLogin):
-    # Placeholder for user authentication logic
-    if user.username == "test" and user.password == "test":  # Example condition
-        return {"message": "Login successful"}
 
 
 @router.get("/")
