@@ -1,13 +1,33 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PageNav } from "../components/PageNav";
 import { Button } from "../components/Button";
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import styles from "./Login.module.css";
 
 export function Login() {
+    const navigate = useNavigate();
+    const { login, register, isAuthentificated } = useAuth();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-    const [isRegistering, setIsRegistering] = useState(false); // State to toggle between login and register forms
+    const [isRegistering, setIsRegistering] = useState(false);
+
+    function handleLoginRegister(event) {
+        event.preventDefault();
+
+        if (isRegistering && email && password && password === confirmPassword)
+            register(email, password);
+
+        if (!isRegistering && email && password) login(email, password);
+    }
+
+    useEffect(
+        function () {
+            if (isAuthentificated) navigate("/app", { replace: true });
+        },
+        [isAuthentificated, navigate]
+    );
 
     return (
         <main className={styles.login}>
@@ -48,7 +68,10 @@ export function Login() {
                 )}
 
                 <div className={styles.buttons}>
-                    <Button type="primary">
+                    <Button
+                        type="primary"
+                        onClick={(event) => handleLoginRegister(event)}
+                    >
                         {isRegistering ? "Register" : "Login"}
                     </Button>
                     <button

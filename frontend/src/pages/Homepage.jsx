@@ -17,7 +17,7 @@ export function Homepage() {
                     Keep track of your travels and revisit your memorable
                     adventures as you chart your journey across the globe.
                 </h2>
-                <Link to="/app" className="cta">
+                <Link to="/login" className="cta">
                     Start tracking now
                 </Link>
             </section>
