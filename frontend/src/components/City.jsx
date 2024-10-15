@@ -1,27 +1,28 @@
 import { useParams, useSearchParams } from "react-router-dom";
-import styles from "./City.module.css";
 import { flagemojiToPNG, formatDate } from "./Sidebar";
 import { useCities } from "../contexts/CitiesContext";
 import { useEffect } from "react";
 import { Spinner } from "./Spinner";
 import { BackButton } from "./BackButton";
+import styles from "./City.module.css";
 
 export function City() {
-    const { id } = useParams();
-    const { currentCity, getCity, isLoading } = useCities();
-    const { cityName, emoji, date, notes } = currentCity;
+    const { id } = useParams(); // Get the city ID from the URL params
+    const { currentCity, getCity, isLoading } = useCities(); // Extract city details from context
+    const { cityName, emoji, date, notes } = currentCity || {}; // Destructure currentCity object
 
     useEffect(
         function () {
-            getCity(id);
+            getCity(id); // Fetch the city details when the component mounts or city ID changes
         },
-        [id]
+        [id] // Dependency array to refetch city data if the ID changes
     );
 
-    if (isLoading) return <Spinner />;
+    if (isLoading) return <Spinner />; // Show a loading spinner while data is being fetched
 
     return (
         <div className={styles.city}>
+            {/* Display the city name and emoji */}
             <div className={styles.row}>
                 <h6>City name</h6>
                 <h3>
@@ -29,11 +30,13 @@ export function City() {
                 </h3>
             </div>
 
+            {/* Display the date of the visit */}
             <div className={styles.row}>
                 <h6>You went to {cityName} on</h6>
                 <p>{formatDate(date || null)}</p>
             </div>
 
+            {/* Display notes if available */}
             {notes && (
                 <div className={styles.row}>
                     <h6>Your notes</h6>
@@ -41,6 +44,7 @@ export function City() {
                 </div>
             )}
 
+            {/* Link to the city's Wikipedia page */}
             <div className={styles.row}>
                 <h6>Learn more</h6>
                 <a
@@ -52,6 +56,7 @@ export function City() {
                 </a>
             </div>
 
+            {/* Back button to navigate to the previous page */}
             <div>
                 <BackButton />
             </div>
