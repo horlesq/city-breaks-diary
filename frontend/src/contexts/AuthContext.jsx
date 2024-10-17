@@ -40,7 +40,6 @@ function AuthProvider({ children }) {
             if (!res.ok) throw new Error("Login failed");
 
             const data = await res.json();
-            console.log(data);
 
             // Dispatch the login action to set the user state
             dispatch({ type: "login", payload: data });
@@ -61,7 +60,7 @@ function AuthProvider({ children }) {
             });
             if (!res.ok) throw new Error("Registration failed");
             const data = await res.json();
-            console.log(data);
+
             // Dispatch register action after registration
             dispatch({ type: "login", payload: data });
         } catch (error) {

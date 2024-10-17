@@ -1,10 +1,5 @@
-import {
-    createContext,
-    useContext,
-    useEffect,
-    useReducer,
-    useState,
-} from "react";
+import { createContext, useContext, useEffect, useReducer } from "react";
+import { useAuth } from "./AuthContext";
 
 const BASE_URL = "http://localhost:8000/trips";
 
@@ -50,41 +45,46 @@ function reducer(state, action) {
             return { ...state, isLoading: false, error: action.payload };
 
         default:
-            throw new Error("Unkwnown action type");
+            throw new Error("Unknown action type");
     }
 }
 
 function CitiesProvider({ children }) {
-    const [user, setUser] = useState("test");
+    const { user } = useAuth();
+    const userName = user !== null ? user.email : null;
     const [{ cities, currentCity, isLoading }, dispatch] = useReducer(
         reducer,
         initialState
     );
 
-    useEffect(function () {
-        async function fetchCities() {
-            try {
-                dispatch({ type: "loading" });
+    useEffect(
+        function () {
+            async function fetchCities() {
+                try {
+                    dispatch({ type: "loading" });
 
-                const res = await fetch(`${BASE_URL}/${user}/cities`);
-                const data = await res.json();
+                    const res = await fetch(`${BASE_URL}/${userName}/cities`);
+                    const data = await res.json();
 
-                dispatch({ type: "cities/loaded", payload: data });
-            } catch (error) {
-                dispatch({
-                    type: "rejected",
-                    payload: "There was an error fetching data...",
-                });
+                    dispatch({ type: "cities/loaded", payload: data });
+                } catch (error) {
+                    dispatch({
+                        type: "rejected",
+                        payload: "There was an error fetching data...",
+                    });
+                }
             }
-        }
-        fetchCities();
-    }, []);
+
+            if (userName) fetchCities();
+        },
+        [userName]
+    );
 
     async function getCity(id) {
         try {
             dispatch({ type: "loading" });
 
-            const res = await fetch(`${BASE_URL}/${user}/cities/${id}`);
+            const res = await fetch(`${BASE_URL}/${userName}/cities/${id}`);
             const data = await res.json();
 
             dispatch({ type: "city/loaded", payload: data });
@@ -100,7 +100,7 @@ function CitiesProvider({ children }) {
         try {
             dispatch({ type: "loading" });
 
-            const res = await fetch(`${BASE_URL}/${user}/cities`, {
+            const res = await fetch(`${BASE_URL}/${userName}/cities`, {
                 method: "POST",
                 body: JSON.stringify(newCity),
                 headers: { "Content-Type": "application/json" },
@@ -128,7 +128,7 @@ function CitiesProvider({ children }) {
         try {
             dispatch({ type: "loading" });
 
-            const res = await fetch(`${BASE_URL}/${user}/cities/${id}`, {
+            const res = await fetch(`${BASE_URL}/${userName}/cities/${id}`, {
                 method: "DELETE",
             });
 
