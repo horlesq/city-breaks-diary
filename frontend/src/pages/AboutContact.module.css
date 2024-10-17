@@ -1,0 +1,39 @@
+.aboutcontact {
+    margin: 2.5rem;
+    padding: 2.5rem 5rem;
+    background-color: var(--color-dark--1);
+    min-height: calc(100vh - 5rem);
+}
+
+.aboutcontact section {
+    width: clamp(80rem, 80%, 90rem);
+    margin: 6rem auto;
+    display: grid;
+    gap: 7rem;
+    align-items: center;
+}
+
+.aboutcontact img {
+    width: 100%;
+}
+
+.aboutcontact h2 {
+    font-size: 4rem;
+    line-height: 1.2;
+    margin-bottom: 3rem;
+}
+
+.aboutcontact h3 {
+    font-size: 2rem;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+}
+
+.aboutcontact p {
+    font-size: 1.6rem;
+    margin-bottom: 2rem;
+}
+
+.aboutcontact section a {
+    margin-top: 2rem;
+}

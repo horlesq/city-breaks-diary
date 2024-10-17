@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { Product } from "./pages/Product";
-import { Pricing } from "./pages/Pricing";
+import { Contact } from "./pages/Contact.jsx";
+import { About } from "./pages/About";
 import { PageNotFound } from "./pages/PageNotFound";
 import { Homepage } from "./pages/Homepage";
 import { AppLayout } from "./pages/AppLayout.jsx";
@@ -21,8 +21,8 @@ export function App() {
                     <Routes>
                         <Route index element={<Homepage />} />
                         <Route path="*" element={<PageNotFound />} />
-                        <Route path="product" element={<Product />} />
-                        <Route path="pricing" element={<Pricing />} />
+                        <Route path="contact" element={<Contact />} />
+                        <Route path="about" element={<About />} />
                         <Route path="login" element={<Login />} />
                         <Route
                             path="app"
