@@ -37,7 +37,7 @@ async def register_user(user: User):
 
     return user
 
-#
+# Login user
 @router.post("/user/login")
 async def login_user(user: User):
     # Check if the user exists in the database
@@ -49,8 +49,6 @@ async def login_user(user: User):
     if not verify_password(user.password, existing_user["password"]):
         raise HTTPException(status_code=400, detail="Invalid password.")
 
-    # Optionally, create a token (JWT) and return it
-    # For simplicity, return a success message for now
     return user
 
 
