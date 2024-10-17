@@ -28,6 +28,13 @@ async def register_user(user: User):
     user_data = {"email": user.email, "password": hashed_password}
     await user_collection.insert_one(user_data)
 
+    # Create an empty trip entry for the new user
+    trip_data = {
+        "user_id": user.email,  # or use user.username if you have that field
+        "cities": []
+    }
+    await trip_collection.insert_one(trip_data)
+
     return user
 
 #
