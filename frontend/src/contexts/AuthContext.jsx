@@ -1,12 +1,18 @@
-import { createContext, useContext, useReducer } from "react";
+import { createContext, useContext, useEffect, useReducer } from "react";
 
 const BASE_URL = "http://localhost:8000/user";
 
 const AuthContext = createContext();
 
+// Function to get initial user state from localStorage
+function getInitialUserState() {
+    const user = localStorage.getItem("user");
+    return user ? JSON.parse(user) : null;
+}
+
 const initialState = {
-    user: null,
-    isAuthentificated: false,
+    user: getInitialUserState(), // Get user info from localStorage
+    isAuthenticated: !!getInitialUserState(), // Boolean to check if user exists
 };
 
 function reducer(state, action) {
@@ -26,6 +32,15 @@ function AuthProvider({ children }) {
         initialState
     );
 
+    useEffect(function () {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+            dispatch({ type: "login", payload: JSON.parse(storedUser) });
+        } else {
+            dispatch({ type: "logout" });
+        }
+    }, []);
+
     // Login function
     async function login(email, password) {
         try {
@@ -40,6 +55,9 @@ function AuthProvider({ children }) {
             if (!res.ok) throw new Error("Login failed");
 
             const data = await res.json();
+
+            // Store user info in localStorage
+            localStorage.setItem("user", JSON.stringify(data));
 
             // Dispatch the login action to set the user state
             dispatch({ type: "login", payload: data });
@@ -61,6 +79,9 @@ function AuthProvider({ children }) {
             if (!res.ok) throw new Error("Registration failed");
             const data = await res.json();
 
+            // Store user info in localStorage after registration
+            localStorage.setItem("user", JSON.stringify(data));
+
             // Dispatch register action after registration
             dispatch({ type: "login", payload: data });
         } catch (error) {
@@ -69,6 +90,7 @@ function AuthProvider({ children }) {
     }
 
     function logout() {
+        localStorage.removeItem("user"); // Clear user info from localStorage
         dispatch({ type: "logout" });
     }
 
