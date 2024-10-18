@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useReducer } from "react";
 
-const BASE_URL = "http://localhost:8000/user";
+const BASE_URL = "https://city-breaks-diary-410d6e129886.herokuapp.com/user";
 
 const AuthContext = createContext();
 
