@@ -5,7 +5,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import styles from "./Login.module.css";
 
-export function Login() {
+export default function Login() {
     const navigate = useNavigate();
     const { login, register, isAuthentificated } = useAuth();
     const [email, setEmail] = useState("");

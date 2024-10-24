@@ -1,7 +1,7 @@
 import { PageNav } from "../components/PageNav";
 import styles from "./AboutContact.module.css";
 
-export function About() {
+export default function About() {
     return (
         <main className={styles.aboutcontact}>
             <PageNav />
