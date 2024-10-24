@@ -1,4 +1,10 @@
-import { createContext, useContext, useEffect, useReducer } from "react";
+import {
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useReducer,
+} from "react";
 import { useAuth } from "./AuthContext";
 
 const BASE_URL = "http://localhost:8000/trips";
@@ -80,7 +86,7 @@ function CitiesProvider({ children }) {
         [userName]
     );
 
-    async function getCity(id) {
+    const getCity = useCallback(async function getCity(id) {
         try {
             dispatch({ type: "loading" });
 
@@ -94,7 +100,7 @@ function CitiesProvider({ children }) {
                 payload: "There was an error fetching data...",
             });
         }
-    }
+    }, [userName]);
 
     async function postCity(newCity) {
         try {

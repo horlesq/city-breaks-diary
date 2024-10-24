@@ -15,7 +15,7 @@ export function City() {
         function () {
             getCity(id); // Fetch the city details when the component mounts or city ID changes
         },
-        [id] // Dependency array to refetch city data if the ID changes
+        [id, getCity] // Dependency array to refetch city data if the ID changes
     );
 
     if (isLoading) return <Spinner />; // Show a loading spinner while data is being fetched
