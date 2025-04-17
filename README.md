@@ -46,7 +46,7 @@ git clone https://github.com/horlesq/city-breaks-diary.git
 ```bash
 cd city-breaks-diary/frontend
 ```
-3. **Install frontend dependencies:**:
+3. **Install frontend dependencies**:
 ```bash
 npm install
 ```
